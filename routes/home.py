@@ -105,7 +105,8 @@ async def bookings(current_user: User_Pydantic = Depends(get_current_user)):
         <html>
             <body>
                 <form method="post" action="/sign_out"><input type="submit" value="Sign out"/></form>
-                Hello, from bookings!
+                <a href="/">Home</a>
+                <h1>Hello, from bookings!</h1>
             </body>
         </html>
     """
