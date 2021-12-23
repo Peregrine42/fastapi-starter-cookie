@@ -1,3 +1,4 @@
+import os
 from tortoise import Tortoise, run_async
 from model.user import User
 from argon2 import PasswordHasher
@@ -6,7 +7,9 @@ ph = PasswordHasher()
 
 
 async def seed():
-    user_obj = User(username="admin", password=ph.hash("admin"))
+    user_obj = User(
+        username="admin", password=ph.hash(os.getenv("ADMIN_PASSWORD", None) or "admin")
+    )
     await user_obj.save()
 
 
