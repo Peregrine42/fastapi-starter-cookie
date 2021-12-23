@@ -13,7 +13,7 @@ async def seed():
     try:
         await user_obj.save()
     except Exception as e:
-        print(e)
+        pass
 
 
 async def init():
