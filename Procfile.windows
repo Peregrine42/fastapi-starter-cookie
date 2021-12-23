@@ -1,2 +1,0 @@
-release: python seed.py
-web: hypercorn main:app

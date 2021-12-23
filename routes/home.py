@@ -1,8 +1,11 @@
+import os
+
 from typing import Optional
 from fastapi import APIRouter, Form, status
 from fastapi.param_functions import Cookie, Depends
 from starlette.responses import HTMLResponse, RedirectResponse
 from helpers.not_authorised_exception import NotAuthorisedException
+from itsdangerous import URLSafeSerializer
 
 from model.user import User, User_Pydantic
 
@@ -58,7 +61,16 @@ async def post_sign_in(username: str = Form(None), password: str = Form(None)):
         return sign_in_form(username)
 
     response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
-    response.set_cookie(key="cookie_sign_in", value=user.id)
+    cookie_value = URLSafeSerializer(
+        os.getenv("SESSION_SECRET", "supersecret"), "auth"
+    ).dumps({"id": user.id})
+    response.set_cookie(
+        key="cookie_sign_in",
+        value=cookie_value,
+        max_age=15 * 60,
+        httponly=True,
+        samesite="strict",
+    )
     return response
 
 
@@ -75,7 +87,10 @@ async def post_sign_out(cookie_sign_in: Optional[str] = Cookie(None)):
 async def get_current_user(cookie_sign_in: Optional[str] = Cookie(None)):
     user = None
     try:
-        user = await User.get(id=cookie_sign_in)
+        id = URLSafeSerializer(
+            os.getenv("SESSION_SECRET", "supersecret"), "auth"
+        ).loads(cookie_sign_in)["id"]
+        user = await User.get(id=id)
         if not user:
             raise NotAuthorisedException()
     except Exception as e:
@@ -86,9 +101,10 @@ async def get_current_user(cookie_sign_in: Optional[str] = Cookie(None)):
 
 @router.get("/bookings", response_class=HTMLResponse)
 async def bookings(current_user: User_Pydantic = Depends(get_current_user)):
-    return """"
+    return """
         <html>
             <body>
+                <form method="post" action="/sign_out"><input type="submit" value="Sign out"/></form>
                 Hello, from bookings!
             </body>
         </html>
@@ -106,6 +122,7 @@ async def index(current_user: User_Pydantic = Depends(get_current_user)):
 
             <body>
                 <form method="post" action="/sign_out"><input type="submit" value="Sign out"/></form>
+                <a href="/bookings">Bookings</a>
                 <h1>Hello, {current_user.username}!!!</h1>
             </body>
         </html>

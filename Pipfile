@@ -10,6 +10,7 @@ fastapi = "*"
 hypercorn = "*"
 tortoise-orm = "*"
 python-multipart = "*"
+itsdangerous = "*"
 
 [dev-packages]
 black = "*"
