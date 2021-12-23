@@ -9,6 +9,7 @@ asyncpg = "*"
 fastapi = "*"
 hypercorn = "*"
 tortoise-orm = "*"
+python-multipart = "*"
 
 [dev-packages]
 black = "*"
