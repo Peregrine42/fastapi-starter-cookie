@@ -95,7 +95,7 @@ async def index(current_user: User_Pydantic = Depends(get_current_user)):
 
             <body>
                 <form method="post" action="/sign_out"><input type="submit" value="Sign out"/></form>
-                <h1>Hello, {current_user.username}</h1>
+                <h1>Hello, {current_user.username}!!!</h1>
             </body>
         </html>
     """
