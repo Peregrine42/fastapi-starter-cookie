@@ -8,9 +8,12 @@ ph = PasswordHasher()
 
 async def seed():
     user_obj = User(
-        username="admin", password=ph.hash(os.getenv("ADMIN_PASSWORD", None) or "admin")
+        username="admin", password=ph.hash(os.getenv("ADMIN_PASSWORD") or "admin")
     )
-    await user_obj.save()
+    try:
+        await user_obj.save()
+    except Exception as e:
+        print(e)
 
 
 async def init():
