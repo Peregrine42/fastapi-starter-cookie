@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from json import JSONEncoder
@@ -13,7 +14,7 @@ app.add_exception_handler(NotAuthorisedException, not_authorised_handler)
 
 register_tortoise(
     app,
-    db_url="sqlite://db.sqlite3",
+    db_url=os.getenv("DATABASE_URL") or "sqlite://db.sqlite3",
     modules={"models": ["model"]},
     generate_schemas=True,
     add_exception_handlers=True,
