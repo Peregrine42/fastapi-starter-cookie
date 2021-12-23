@@ -84,7 +84,7 @@ async def get_current_user(cookie_sign_in: Optional[str] = Cookie(None)):
     return await User_Pydantic.from_tortoise_orm(user)
 
 
-@router.get("/bookings")
+@router.get("/bookings", response_class=HTMLResponse)
 async def bookings(current_user: User_Pydantic = Depends(get_current_user)):
     return """"
         <html>
