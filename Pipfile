@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+argon2-cffi = "*"
+asyncpg = "*"
+fastapi = "*"
+hypercorn = "*"
+tortoise-orm = "*"
+
+[dev-packages]
+black = "*"
+rope = "*"
+flake8 = "*"
+
+[requires]
+python_version = "3.10"

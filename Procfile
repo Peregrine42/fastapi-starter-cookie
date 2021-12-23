@@ -1,2 +1,2 @@
 release: python seed.py
-web: hypercorn -b 0.0.0.0:${PORT} "main:app"
+web: hypercorn -b 0.0.0.0:${PORT} main:app
