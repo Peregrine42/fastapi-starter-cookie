@@ -64,7 +64,10 @@ async def file_list_page(request, rows):
 
 
 @router.get("/", response_class=HTMLResponse)
-async def get_sign_in(request: Request):
+async def get_sign_in(
+    request: Request,
+    current_user: User_Pydantic = Depends(get_current_user),
+):
     return HTMLResponse(looper_page(request))
 
 
@@ -86,7 +89,10 @@ async def create_upload_file(
 
 
 @router.get("/files/{key}")
-async def get_file(key):
+async def get_file(
+    key,
+    current_user: User_Pydantic = Depends(get_current_user),
+):
     fb = await FileBackup_Pydantic.from_queryset_single(FileBackup.get(key=key))
 
     response = Response(content=fb.content, media_type=fb.content_type)
@@ -98,6 +104,9 @@ async def get_file(key):
 
 
 @router.get("/files", response_class=HTMLResponse)
-async def list_files(request: Request):
+async def list_files(
+    request: Request,
+    current_user: User_Pydantic = Depends(get_current_user),
+):
     rows = await FileBackup_Pydantic.from_queryset(FileBackup.all())
     return HTMLResponse(await file_list_page(request, rows))
