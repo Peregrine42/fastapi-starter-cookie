@@ -4,10 +4,11 @@ from typing import Optional
 from fastapi import APIRouter, Form, status, Request
 from fastapi.param_functions import Cookie, Depends
 from starlette.responses import HTMLResponse, RedirectResponse
-from helpers.not_authorised_exception import NotAuthorisedException
 from itsdangerous import URLSafeSerializer
 
 from model.user import User, User_Pydantic
+from helpers.get_current_user import get_current_user
+from routes.looper import router as looper_router
 
 router = APIRouter()
 
@@ -16,7 +17,7 @@ def sign_in_form(request, username=None):
     return f"""
         <html>
             <head>
-                <title>Starter</title>
+                <title></title>
             </head>
 
             <body>
@@ -94,37 +95,6 @@ async def post_sign_out(
         return RedirectResponse("/", status_code=status.HTTP_302_FOUND)
 
 
-async def get_current_user(cookie_sign_in: Optional[str] = Cookie(None)):
-    user = None
-    try:
-        id = URLSafeSerializer(
-            os.getenv("SESSION_SECRET", "supersecret"), "auth"
-        ).loads(cookie_sign_in)["id"]
-        user = await User.get(id=id)
-        if not user:
-            raise NotAuthorisedException()
-    except Exception as e:
-        print(e)
-        raise NotAuthorisedException()
-    return await User_Pydantic.from_tortoise_orm(user)
-
-
-@router.get("/bookings", response_class=HTMLResponse)
-async def bookings(
-    request: Request,
-    current_user: User_Pydantic = Depends(get_current_user),
-):
-    return f"""
-        <html>
-            <body>
-                <form method="post" action="/sign_out"><input type="hidden" name="csrftoken" value="{request.scope["csrftoken"]()}"/><input type="submit" value="Sign out"/></form>
-                <a href="/">Home</a>
-                <h1>Hello, from bookings!</h1>
-            </body>
-        </html>
-    """
-
-
 @router.get("/", response_class=HTMLResponse)
 async def index(
     request: Request,
@@ -138,8 +108,10 @@ async def index(
 
             <body>
                 <form method="post" action="/sign_out"><input type="hidden" name="csrftoken" value="{request.scope["csrftoken"]()}"/><input type="submit" value="Sign out"/></form>
-                <a href="/bookings">Bookings</a>
                 <h1>Hello, {current_user.username}!!!</h1>
             </body>
         </html>
     """
+
+
+router.include_router(looper_router, prefix="/looper")
